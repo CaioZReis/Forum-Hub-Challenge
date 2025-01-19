@@ -4,5 +4,6 @@ public record DadosAtualizacaoTopicos(
         String titulo,
         String mensagem,
         String autor,
-        String curso) {
+        String curso
+) {
 }

@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,32 +28,37 @@ public class TopicosController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<String> cadastrarTopico(@RequestBody @Valid DadosCadastroTopicos topico){
+    public ResponseEntity cadastrarTopico(@RequestBody @Valid DadosCadastroTopicos topico, UriComponentsBuilder uriComponentsBuilder){
         if (repositorioTopicos.existsByTituloAndMensagem(topico.titulo(), topico.mensagem())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe um tópico com o mesmo título e mensagem.");
         }
-        repositorioTopicos.save(new Topicos(topico));
+        var criarTopico = new Topicos(topico);
+        repositorioTopicos.save(criarTopico);
 
-        return ResponseEntity.ok("Tópico criado com sucesso.");
+        var uri = uriComponentsBuilder.path("/topico/{id}").buildAndExpand(criarTopico.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosListagemTopicos(criarTopico));
     }
 
     @GetMapping
-    public Page<DadosListagemTopicos> verTopicos(@PageableDefault(size = 10, sort = {"dataCriacao"}) Pageable paginacao) {
-        return repositorioTopicos.findAll(paginacao).map(DadosListagemTopicos::new);
+    public ResponseEntity<Page<DadosListagemTopicos>> verTopicos(@PageableDefault(size = 10, sort = {"dataCriacao"}) Pageable paginacao) {
+        var pagina = repositorioTopicos.findAll(paginacao).map(DadosListagemTopicos::new);
+        return ResponseEntity.ok(pagina);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DadosListagemTopicos> verTopicosPorId(@PathVariable Long id) {
-        return repositorioTopicos.findById(id)
-                .map(topicos -> ResponseEntity
-                        .ok(new DadosListagemTopicos(topicos)))
-                .orElse(ResponseEntity
-                        .notFound().build());
+    public ResponseEntity<?> verTopicosPorId(@PathVariable Long id) {
+        if (!repositorioTopicos.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("O tópico com o ID " + id + " não foi encontrado.");
+        }
+        var topico = repositorioTopicos.getReferenceById(id);
+        return ResponseEntity.ok(new DadosListagemTopicos(topico));
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<String> atualizarTopico(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoTopicos topico){
+    public ResponseEntity<String> atualizarTopico(@PathVariable Long id, @RequestBody @Valid DadosCadastroTopicos topico){
         if (!repositorioTopicos.existsById(id))  {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico com ID " + id + " não encontrado.");
         }
@@ -60,7 +66,7 @@ public class TopicosController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe um tópico com o mesmo título e mensagem.");
         }
         var alterar = repositorioTopicos.getReferenceById(id);
-        alterar.alterarTopico(topico);
+        alterar.alterarTopico(new Topicos(topico));
         return ResponseEntity.ok("Tópico atualizado com sucesso.");
     }
 
@@ -71,6 +77,6 @@ public class TopicosController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tópico com ID " + id + " não encontrado.");
         }
         repositorioTopicos.deleteById(id);
-        return ResponseEntity.ok("Tópico deletado com sucesso.");
+        return ResponseEntity.noContent().build();
     }
 }

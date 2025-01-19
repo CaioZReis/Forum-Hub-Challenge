@@ -68,18 +68,21 @@ public class Topicos {
         return id;
     }
 
-    public void alterarTopico(DadosAtualizacaoTopicos topico){
-        if (topico.titulo() != null){
-            this.titulo = topico.titulo();
+    public void alterarTopico(Topicos topico){
+        if (topico.getTitulo() != null){
+            this.titulo = topico.getTitulo();
         }
-        if (topico.mensagem() != null){
-            this.mensagem = topico.mensagem();
+        if (topico.getMensagem() != null){
+            this.mensagem = topico.getMensagem();
         }
-        if (topico.autor() != null){
-            this.autor = topico.autor();
+        if (topico.getAutor() != null){
+            this.autor = topico.getAutor();
         }
-        if (topico.curso() != null){
-            this.curso = topico.curso();
+        if (topico.getCurso() != null){
+            this.curso = topico.getCurso();
+        }
+        if (topico.getDataCriacao() != null){
+            this.dataCriacao = topico.getDataCriacao();
         }
     }
 

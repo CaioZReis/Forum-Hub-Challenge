@@ -11,5 +11,6 @@ public record DadosCadastroTopicos(
         @NotBlank
         String autor,
         @NotBlank
-        String curso) {
+        String curso
+) {
 }
