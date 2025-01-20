@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public record DadosListagemTopicos(
-        //Lembrar de retirar o id do corpo do Json
-        Long id,
+
         String titulo,
         String mensagem,
         LocalDateTime dataCriacao,
@@ -17,6 +16,6 @@ public record DadosListagemTopicos(
         String curso
 ){
     public DadosListagemTopicos(Topicos topicos){
-        this(topicos.getId(), topicos.getTitulo(), topicos.getMensagem(), topicos.getDataCriacao(), topicos.isEstado(), topicos.getAutor(), topicos.getCurso());
+        this(topicos.getTitulo(), topicos.getMensagem(), topicos.getDataCriacao(), topicos.isEstado(), topicos.getAutor(), topicos.getCurso());
     }
 }

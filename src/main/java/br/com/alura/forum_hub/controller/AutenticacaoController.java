@@ -1,4 +1,4 @@
-package br.com.alura.forum_hub;
+package br.com.alura.forum_hub.controller;
 
 import br.com.alura.forum_hub.dto.DadosAutenticacaoUsuario;
 import br.com.alura.forum_hub.dto.DadosTokenJWT;
